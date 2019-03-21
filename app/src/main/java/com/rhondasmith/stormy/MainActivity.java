@@ -87,7 +87,8 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isNetworkAvailable() {
         // We have to cast getSystemService(Context.CONNECTIVITY_SERVICE) to ConnectivityManger
-        // Because getSystemService returns the
+        // Because getSystemService returns a generic object so we have to cast it to the
+        // ConnectivityManager type
         ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
         // Like the internet permission, we also had to add permission to access the network state
