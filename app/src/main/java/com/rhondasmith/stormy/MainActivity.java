@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
         // GET the weather data:
             String apiKey = "534a82b17a110315d631fe419efc5d82";
 
-            double latitude = 37.8267;
+            double latitude = 37.8267; // use something like 99999 to force error for test
             double longitude = -122.4233;
             String forecastURL = "https://api.darksky.net/forecast/"
                     + apiKey + "/" + latitude +  "," + longitude;
@@ -59,6 +59,9 @@ public class MainActivity extends AppCompatActivity {
                             // okHttp string() not to be confused with toString()
                             Log.v(TAG, response.body().string());
                         }
+                        else {
+                            alertUserAboutError();
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                         Log.e(TAG, "ID Exception caught: ", e);
@@ -69,10 +72,15 @@ public class MainActivity extends AppCompatActivity {
 
             // If this was synchronous code, this wouldn't show up until the response finished
             // But with asynchronous code, this runs first while the response is happening in
-            // the background and excutes last, when it's done
+            // the background and executes last, when it's done
             // asynchronous processing is a bridge between background thread and the main thread
             Log.d(TAG, "Main UI code is running, hooray!");
 
+    }
+
+    private void alertUserAboutError() {
+        AlertDialogFragment dialog = new AlertDialogFragment();
+        dialog.show(getSupportFragmentManager(), "error_dialog");
     }
 
 }
