@@ -8,6 +8,7 @@ public class CurrentWeather {
     private double humidity;
     private double precipChance;
     private String summary;
+    private double time;
 
     public String getLocationLabel() {
         return locationLabel;
@@ -55,5 +56,13 @@ public class CurrentWeather {
 
     public void setSummary(String summary) {
         this.summary = summary;
+    }
+
+    public double getTime() {
+        return time;
+    }
+
+    public void setTime(long time) {
+        this.time = time;
     }
 }

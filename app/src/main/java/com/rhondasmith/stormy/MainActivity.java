@@ -106,11 +106,32 @@ public class MainActivity extends AppCompatActivity {
         JSONObject forecast = new JSONObject(jsonData);
 
         // Here, making sure that we are getting data from the weather API by logging some of it:
-        String timezone = forecast.getString("timezone");
-        Log.i(TAG, "From JSON: " + timezone);
+            String timezone = forecast.getString("timezone");
+            Log.i(TAG, "From JSON: " + timezone);
 
-        // Eventually, we will return a CurrentWeather object
-        return null;
+            // To get something from a nested JSON object, we have to getJSONObject from the
+            // root object:
+            JSONObject currently = forecast.getJSONObject("currently");
+            // And now we can get strings from the nested JSONObject with getString as before:
+            Log.i(TAG, "From JSON: " + currently.getString("summary"));
+
+        // Eventually, we will return an instance of the  CurrentWeather class
+        // Before it was null just so we wouldn't get an error for not having a return value
+        // We can set values for our data model using actual data from the weather API:
+        // Instead of having a bunch of log statements to check these, it's easier to check
+        // values by running the app with the debugger/a break point at CurrentWeather
+        // and stepping through the CurrentWeather object to see the values as they come in:
+        CurrentWeather currentWeather = new CurrentWeather();
+
+        currentWeather.setHumidity(currently.getDouble("humidity"));
+        currentWeather.setTime(currently.getLong("time"));
+        currentWeather.setIcon(currently.getString("icon"));
+        currentWeather.setLocationLabel("Alcatraz Island, CA");
+        currentWeather.setPrecipChance(currently.getDouble("precipProbability"));
+        currentWeather.setSummary(currently.getString("summary"));
+        currentWeather.setTemperature(currently.getDouble("temperature"));
+
+        return currentWeather;
     }
 
     private boolean isNetworkAvailable() {
