@@ -1,5 +1,13 @@
 package com.rhondasmith.stormy;
 
+import android.util.Log;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+
+import static android.content.ContentValues.TAG;
+
 public class CurrentWeather {
 
     private String locationLabel;
@@ -9,6 +17,17 @@ public class CurrentWeather {
     private double precipChance;
     private String summary;
     private double time;
+    // Adding timeZone (+it's getter and setter) which we got from the API and logged in
+    // Main Activity, to the data model to help with the human readable time:
+    private String timeZone;
+
+    public String getTimeZone() {
+        return timeZone;
+    }
+
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
+    }
 
     public String getLocationLabel() {
         return locationLabel;
@@ -65,4 +84,23 @@ public class CurrentWeather {
     public void setTime(long time) {
         this.time = time;
     }
+
+    public String getFormattedTime() {
+        // SimpleDateFormat and TimeZone are built-in Android classes that are imported here:
+        // Setting the human readable format for time we want to use:
+        SimpleDateFormat formatter = new SimpleDateFormat("h:mm a");
+
+        // Setting the time zone for the newly formatted time, we take the timezone set when
+        // the CurrentWeather object is constructed:
+        formatter.setTimeZone(TimeZone.getTimeZone(timeZone));
+
+        // The tutorial says to multiply time * 1000 to get current milliseconds but
+        // this Date constructor returns current milliseconds already now:
+        Date dateTime = new Date();
+
+        // Return the timezone appropriate human readable formatted time:
+        return formatter.format(dateTime);
+    }
+
+
 }

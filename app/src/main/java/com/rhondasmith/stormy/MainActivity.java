@@ -130,6 +130,12 @@ public class MainActivity extends AppCompatActivity {
         currentWeather.setPrecipChance(currently.getDouble("precipProbability"));
         currentWeather.setSummary(currently.getString("summary"));
         currentWeather.setTemperature(currently.getDouble("temperature"));
+        // because we added timezone to our data model, and are using it,  need to set a value
+        // No more error because we added timezone property + getter & setter in CurrentWeather
+        currentWeather.setTimeZone(timezone);
+
+        // Checking on our human readable time:
+        Log.d(TAG, "HUMAN TIME: " + currentWeather.getFormattedTime());
 
         return currentWeather;
     }
