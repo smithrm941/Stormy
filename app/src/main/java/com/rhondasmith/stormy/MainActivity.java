@@ -8,6 +8,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 
 import okhttp3.Call;
@@ -19,6 +22,9 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = MainActivity.class.getSimpleName();
+
+    // Want to set this when we get a successful response
+    public CurrentWeather currentWeather;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,16 +67,24 @@ public class MainActivity extends AppCompatActivity {
                     public void onResponse(Call call, Response response) throws IOException {
                         // Response from Dark Sky:
                         try {
-                            //Response response = call.execute();
+                            // okHttp string() not to be confused with toString()
+                            String jsonData = response.body().string();
+                            Log.v(TAG, jsonData);
+                            // We don't need this response definition because it is defined
+                            // in the onResponse parameters:
+                            // Response response = call.execute();
                             if (response.isSuccessful()) {
-                                // okHttp string() not to be confused with toString()
-                                Log.v(TAG, response.body().string());
+                                currentWeather = getCurrentDetails(jsonData);
                             } else {
                                 alertUserAboutError();
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
                             Log.e(TAG, "ID Exception caught: ", e);
+                        // because the JSONException is thrown by getCurrentDetails which is
+                        // being called in the try block here, it can also be caught here:
+                        } catch (JSONException e) {
+                            Log.e(TAG, "JSON Exception caught: ", e);
                         }
 
                     }
@@ -83,6 +97,20 @@ public class MainActivity extends AppCompatActivity {
             }
             Log.d(TAG, "Main UI code is running, hooray!");
 
+    }
+
+    private CurrentWeather getCurrentDetails(String jsonData) throws JSONException {
+        // initially have a JSONException
+        // can put a try/catch here but it would be better to have it where getCurrentDetails()
+        // is called so we 'throw' it there
+        JSONObject forecast = new JSONObject(jsonData);
+
+        // Here, making sure that we are getting data from the weather API by logging some of it:
+        String timezone = forecast.getString("timezone");
+        Log.i(TAG, "From JSON: " + timezone);
+
+        // Eventually, we will return a CurrentWeather object
+        return null;
     }
 
     private boolean isNetworkAvailable() {
