@@ -2,6 +2,7 @@ package com.rhondasmith.stormy;
 
 import android.content.Context;
 import android.databinding.DataBindingUtil;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
@@ -47,6 +48,9 @@ public class MainActivity extends AppCompatActivity {
         TextView darkSky = findViewById(R.id.darkSkyAttribution);
 
         darkSky.setMovementMethod(LinkMovementMethod.getInstance());
+
+        // initializing value for updating icon:
+        iconImageView = findViewById(R.id.iconImageView);
 
         // GET the weather data:
             String apiKey = "534a82b17a110315d631fe419efc5d82";
@@ -94,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                                 currentWeather = getCurrentDetails(jsonData);
 
                                 // Binding data to our binding variable:
-                                CurrentWeather displayWeather = new CurrentWeather(
+                                final CurrentWeather displayWeather = new CurrentWeather(
                                         currentWeather.getLocationLabel(),
                                         currentWeather.getIcon(),
                                         currentWeather.getTemperature(),
@@ -108,6 +112,22 @@ public class MainActivity extends AppCompatActivity {
                                 // we have to make sure it's declared final since we are using
                                 // binding from an inner class
                                 binding.setWeather(displayWeather);
+
+                                // updating icon:
+                                // we want our weather icon to match what's being displayed:
+                                // this got an error in Treehouse for updating the UI from a background
+                                // process but there wasn't an error here
+                                Drawable drawable = getResources().getDrawable(displayWeather.getIconId());
+//                                iconImageView.setImageDrawable(drawable);
+//
+                                // Alternative to the above from Treehouse:
+                                // Treehouse also suggested changing displayWeather above to final
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        iconImageView.setImageDrawable(drawable);
+                                    }
+                                });
 
                             } else {
                                 alertUserAboutError();
