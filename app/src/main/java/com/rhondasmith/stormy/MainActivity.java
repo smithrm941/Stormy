@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,9 +37,19 @@ public class MainActivity extends AppCompatActivity {
     // Updating icon
     private ImageView iconImageView;
 
+    // Passing latitude and longitude to getForecast method:
+    final double latitude = 37.8267; // use something like 99999 to force error for test
+    final double longitude = -122.4233;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getForecast(latitude, longitude);
+        Log.d(TAG, "Main UI code is running, hooray!");
+
+    }
+
+    private void getForecast(double latitude, double longitude) {
         //setContentView(R.layout.activity_main);
         // updating setContentView for data binding:
         final ActivityMainBinding binding = DataBindingUtil.setContentView(MainActivity.this,
@@ -53,104 +64,100 @@ public class MainActivity extends AppCompatActivity {
         iconImageView = findViewById(R.id.iconImageView);
 
         // GET the weather data:
-            String apiKey = "534a82b17a110315d631fe419efc5d82";
+        String apiKey = "534a82b17a110315d631fe419efc5d82";
 
-            double latitude = 37.8267; // use something like 99999 to force error for test
-            double longitude = -122.4233;
-            String forecastURL = "https://api.darksky.net/forecast/"
-                    + apiKey + "/" + latitude +  "," + longitude;
+        String forecastURL = "https://api.darksky.net/forecast/"
+                + apiKey + "/" + latitude +  "," + longitude;
 
-            // in the isNetworkAvailable() method in this class,
-            // we set a return value based on network availability
-            if(isNetworkAvailable()) {
-                // Our main client object:
-                OkHttpClient client = new OkHttpClient();
+        // in the isNetworkAvailable() method in this class,
+        // we set a return value based on network availability
+        if(isNetworkAvailable()) {
+            // Our main client object:
+            OkHttpClient client = new OkHttpClient();
 
-                // A request for the client to send to the Dark Sky server:
-                Request request = new Request.Builder()
-                        .url(forecastURL)
-                        .build();
+            // A request for the client to send to the Dark Sky server:
+            Request request = new Request.Builder()
+                    .url(forecastURL)
+                    .build();
 
-                Call call = client.newCall(request);
+            Call call = client.newCall(request);
 
-                // the queue method is provided by OkHttp and executes calls asynchronously
-                // with one call in the queue, it is executed right away
-                // this code is being executed in the background while we can continue
-                // to execute code on the main UI thread
-                call.enqueue(new Callback() {
-                    // this is an anonymous inner class, of type Callback with two methods to override:
-                    @Override
-                    public void onFailure(Call call, IOException e) {
+            // the queue method is provided by OkHttp and executes calls asynchronously
+            // with one call in the queue, it is executed right away
+            // this code is being executed in the background while we can continue
+            // to execute code on the main UI thread
+            call.enqueue(new Callback() {
+                // this is an anonymous inner class, of type Callback with two methods to override:
+                @Override
+                public void onFailure(Call call, IOException e) {
 
-                    }
+                }
 
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        // Response from Dark Sky:
-                        try {
-                            // okHttp string() not to be confused with toString()
-                            String jsonData = response.body().string();
-                            Log.v(TAG, jsonData);
-                            // We don't need this response definition because it is defined
-                            // in the onResponse parameters:
-                            // Response response = call.execute();
-                            if (response.isSuccessful()) {
-                                currentWeather = getCurrentDetails(jsonData);
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    // Response from Dark Sky:
+                    try {
+                        // okHttp string() not to be confused with toString()
+                        String jsonData = response.body().string();
+                        Log.v(TAG, jsonData);
+                        // We don't need this response definition because it is defined
+                        // in the onResponse parameters:
+                        // Response response = call.execute();
+                        if (response.isSuccessful()) {
+                            currentWeather = getCurrentDetails(jsonData);
 
-                                // Binding data to our binding variable:
-                                final CurrentWeather displayWeather = new CurrentWeather(
-                                        currentWeather.getLocationLabel(),
-                                        currentWeather.getIcon(),
-                                        currentWeather.getTemperature(),
-                                        currentWeather.getHumidity(),
-                                        currentWeather.getPrecipChance(),
-                                        currentWeather.getSummary(),
-                                        currentWeather.getTime(),
-                                        currentWeather.getTimeZone()
-                                );
+                            // Binding data to our binding variable:
+                            final CurrentWeather displayWeather = new CurrentWeather(
+                                    currentWeather.getLocationLabel(),
+                                    currentWeather.getIcon(),
+                                    currentWeather.getTemperature(),
+                                    currentWeather.getHumidity(),
+                                    currentWeather.getPrecipChance(),
+                                    currentWeather.getSummary(),
+                                    currentWeather.getTime(),
+                                    currentWeather.getTimeZone()
+                            );
 
-                                // we have to make sure it's declared final since we are using
-                                // binding from an inner class
-                                binding.setWeather(displayWeather);
+                            // we have to make sure it's declared final since we are using
+                            // binding from an inner class
+                            binding.setWeather(displayWeather);
 
-                                // updating icon:
-                                // we want our weather icon to match what's being displayed:
-                                // this got an error in Treehouse for updating the UI from a background
-                                // process but there wasn't an error here
-                                Drawable drawable = getResources().getDrawable(displayWeather.getIconId());
+                            // updating icon:
+                            // we want our weather icon to match what's being displayed:
+                            // this got an error in Treehouse for updating the UI from a background
+                            // process but there wasn't an error here
+                            Drawable drawable = getResources().getDrawable(displayWeather.getIconId());
 //                                iconImageView.setImageDrawable(drawable);
 //
-                                // Alternative to the above from Treehouse:
-                                // Treehouse also suggested changing displayWeather above to final
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        iconImageView.setImageDrawable(drawable);
-                                    }
-                                });
+                            // Alternative to the above from Treehouse:
+                            // Treehouse also suggested changing displayWeather above to final
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    iconImageView.setImageDrawable(drawable);
+                                }
+                            });
 
-                            } else {
-                                alertUserAboutError();
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            Log.e(TAG, "ID Exception caught: ", e);
-                        // because the JSONException is thrown by getCurrentDetails which is
-                        // being called in the try block here, it can also be caught here:
-                        } catch (JSONException e) {
-                            Log.e(TAG, "JSON Exception caught: ", e);
+                        } else {
+                            alertUserAboutError();
                         }
-
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Log.e(TAG, "ID Exception caught: ", e);
+                    // because the JSONException is thrown by getCurrentDetails which is
+                    // being called in the try block here, it can also be caught here:
+                    } catch (JSONException e) {
+                        Log.e(TAG, "JSON Exception caught: ", e);
                     }
-                });
 
-                // If this was synchronous code, this wouldn't show up until the response finished
-                // But with asynchronous code, this runs first while the response is happening in
-                // the background and executes last, when it's done
-                // asynchronous processing is a bridge between background thread and the main thread
-            }
-            Log.d(TAG, "Main UI code is running, hooray!");
+                }
+            });
 
+            // If this was synchronous code, this wouldn't show up until the response finished
+            // But with asynchronous code, this runs first while the response is happening in
+            // the background and executes last, when it's done
+            // asynchronous processing is a bridge between background thread and the main thread
+        }
     }
 
     private CurrentWeather getCurrentDetails(String jsonData) throws JSONException {
@@ -225,6 +232,11 @@ public class MainActivity extends AppCompatActivity {
     private void alertUserAboutError() {
         AlertDialogFragment dialog = new AlertDialogFragment();
         dialog.show(getSupportFragmentManager(), "error_dialog");
+    }
+
+    public void refreshOnClick(View view) {
+        Toast.makeText(this, "Refreshing data", Toast.LENGTH_LONG).show();
+        getForecast(latitude, longitude);
     }
 
 }
