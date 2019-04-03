@@ -1,6 +1,7 @@
 package com.rhondasmith.stormy;
 
 import android.content.Context;
+import android.databinding.DataBindingUtil;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +10,8 @@ import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.rhondasmith.stormy.databinding.ActivityMainBinding;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,7 +34,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        //setContentView(R.layout.activity_main);
+        // updating setContentView for data binding:
+        final ActivityMainBinding binding = DataBindingUtil.setContentView(MainActivity.this,
+                R.layout.activity_main);
 
         // Making the Dark Sky attribution link work:
         TextView darkSky = findViewById(R.id.darkSkyAttribution);
@@ -82,6 +88,23 @@ public class MainActivity extends AppCompatActivity {
                             // Response response = call.execute();
                             if (response.isSuccessful()) {
                                 currentWeather = getCurrentDetails(jsonData);
+
+                                // Binding data to our binding variable:
+                                CurrentWeather displayWeather = new CurrentWeather(
+                                        currentWeather.getLocationLabel(),
+                                        currentWeather.getIcon(),
+                                        currentWeather.getTemperature(),
+                                        currentWeather.getHumidity(),
+                                        currentWeather.getPrecipChance(),
+                                        currentWeather.getSummary(),
+                                        currentWeather.getTime(),
+                                        currentWeather.getTimeZone()
+                                );
+
+                                // we have to make sure it's declared final since we are using
+                                // binding from an inner class
+                                binding.setWeather(displayWeather);
+
                             } else {
                                 alertUserAboutError();
                             }

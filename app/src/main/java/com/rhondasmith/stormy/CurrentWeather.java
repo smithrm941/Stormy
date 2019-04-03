@@ -21,6 +21,22 @@ public class CurrentWeather {
     // Main Activity, to the data model to help with the human readable time:
     private String timeZone;
 
+    public CurrentWeather() {
+    }
+
+    public CurrentWeather(String locationLabel, String icon, double temperature,
+                          double humidity, double precipChance, String summary, double time,
+                          String timeZone) {
+        this.locationLabel = locationLabel;
+        this.icon = icon;
+        this.temperature = temperature;
+        this.humidity = humidity;
+        this.precipChance = precipChance;
+        this.summary = summary;
+        this.time = time;
+        this.timeZone = timeZone;
+    }
+
     public String getTimeZone() {
         return timeZone;
     }
